@@ -1,5 +1,4 @@
-(function(){
-        
+     
         var dictionary = function(){
             
             var result = {};
@@ -54,50 +53,40 @@
             return result;
         }
         
-        var prefix_code = [];
-        var append_character = [];
+  
         function decode(str){
             
-            var next_code,
-                new_code,
-                old_code,
-                character,
-                counter,
-                string,
-                out_str;
-            next_code = 256;
-            counter = 0;
-            //old_code = str[0];
-            character = old_code;
-            out_str = old_code;
-            for(var c in str){
-                new_code = str[c];
-                string = decode_string(new_code);
-                out_str+= string;
+            var table = tTable(),
+            buffer = '',
+            outStr = [];
+           
+            outStr.push(str[0]);
+            var first_code = str[0].charCodeAt(0);
+            var len = str.length;
+            var counter = 255;
+            for (var i=1; i < len; i++) {
+                var next_code = str[i].charCodeAt(0);
                 
-                if(next_code < 100000){
-                    prefix_code[next_code] = old_code;
-                    append_character[next_code] = character;
-                    next_code++;
-                }
-                old_code = new_code;
-            }
-            
-            return out_str;
+                if(table[next_code]){
+                    buffer = table[next_code]
+                
+                    table[++counter] = table[first_code] +
+                                       table[next_code];
+                    first_code = next_code;
+                }else{
+                    console.log('else');
+                    buffer = table[first_code].charCodeAt(0);
+                    buffer = buffer + next_code;
+                    buffer = String.fromCharCode(buffer);
+                    console.log(buffer);
+;                }
+                
+                outStr.push(buffer);
+            };
+            return outStr.join('');
+ 
         }
         
-        function decode_string(str){
-            var i = 0;
-            var buffer = '';
-            var code = str.charCodeAt(0);
-            while(code > 255){
-                buffer += append_character[code];
-                code = prefix_code[code];
-            }
-            
-            buffer = code;
-            return buffer;
-        }
         
         function size(str){
 
