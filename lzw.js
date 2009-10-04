@@ -1,9 +1,15 @@
 (function(){
     
-    if(typeof(document.saw) !== object){
-        document.saw = {};
+    //create "saw" global if not there
+    if(window.saw === undefined){
+        window.saw = {};
     }
-    
+    /**
+     * Returns a pre-popuated dictionary to begin encoding
+     * @private
+     * @method getDic
+     * @return {Object} result a hash table with ascii letters as keys
+     */
     function getDic(){
         var result = {};
         for (var i=0; i < 256; i++) {
@@ -13,6 +19,12 @@
         return result;
     }
     
+    /**
+     * Prepopulates translation table
+     * @private
+     * @method tTable
+     * @return {Object} translation table (hash table)
+     */
     function tTable(){
         var result = {};
         for (var i=0; i < 256; i++) {
@@ -22,23 +34,34 @@
         return result;
     }
     
+    //Define the object and public methods
     var LZW = {
         
+        /**
+         * Encodes the string as an LZW compressed binary stream...except
+         * because we can't really use binary in javascript we are using the unicode
+         * character specified by the decimal code output by the algorithm in each place
+         *
+         * @method encode
+         * @param {String} str The string to encode
+         * @return {String} str The encoded string
+         */ 
         encode:function(str){
-            var index = 256;    
-            var dictionary = getDic();
-            var outStr = [];
-            var s = '';
+            var index = 256,
+            dictionary = getDic(),
+            outStr = [],
+            s = '';
 
-            var len = str.length;
+            var len = str.length,
             s = str[0];
+            
             for(var i=1; i < len; i++){
                 var c = str[i];
                 if(dictionary[s+c]){
                     s = s+c;
                 }else{
-                    //console.log(ch + 'sec');
                     var code = ++index;
+                    
                     outStr.push(String.fromCharCode(dictionary[s]));
                     dictionary[s+c] = code;
                     s = c;
@@ -47,48 +70,70 @@
             for(var c in s ){
                 outStr.push(s[c]);
             }
+            
 
+        
             return outStr.join('');
         },
         
         decode:function(str){
             
+            //init translation table
              var table = tTable(),
+             
+             //buffer will store the string we are working on
              buffer = '',
-             outStr = [];
-
-            // outStr.push(str[0]);
-             var first_code = str[0].charCodeAt(0);
-             var len = str.length;
-             var counter = 255;
-             var character = '';
+             
+             //store the characters in an array as they are added
+             outStr = [],
+             
+             //init first_code
+             first_code = str[0].charCodeAt(0),
+             
+             //get string length for loop
+             len = str.length,
+             
+             //counter so we know where to start after the base table
+             counter = 255,
+             
+             //this will be handy for the case where next_code does not exist in the table
+             character = '';
+                 
+             //main decode loop
              for (var i=0; i < len; i++) {
                  var next_code = str[i].charCodeAt(0);
 
-                 if(!table[next_code]){
+                 if(!table[next_code]){ //handles the exception case
                      buffer = table[first_code];
                      buffer = buffer + character;
                  }else{
+                     //add decoded char to buffer
                      buffer = table[next_code];
-
                  }
-
+                 
+                 //add buffer to output
                  outStr.push(buffer);
+                 
                  character = buffer[0];
+                 //add new substring to table
                  table[++counter] = table[first_code] +
                                     character;
-
+                                    
+                 //time for the next char
                  first_code = next_code;
-
-
              };
 
              return outStr.join('');
+        },
+        
+        strSize:function(str){
+
+            return encodeURIComponent(str).replace(/%../g, 'x').length;
         }
         
     };
     
-    document.saw.lzw = LZW;
+    window.saw.lzw = LZW;
 
 
 }());
