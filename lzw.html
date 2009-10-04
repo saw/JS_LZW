@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>LZW </title>
+</head>
+<body>
+    <h1>LZW compression?</h1>
+    <p>The algorithm works by scanning through the input string for successively longer substrings until it finds one that is not in the dictionary, which is initialized to contain just the single-character strings corresponding to all the possible input characters. When such a string is found, it is added to the dictionary, and the index for the string less the last character (i.e., the longest substring that is in the dictionary) is retrieved from the dictionary and sent to output. The last input character is then used as the next starting point to scan for substrings. (per wikipedia)</p>
+    <p>The algorithm works best on data with repeated patterns, so the initial parts of a message will see little compression. As the message grows, however, the compression ratio tends asymptotically to the maximum.[1]</p>
+    <form id="myform" action="lzw_submit" method="post">
+        <p><textarea rows="8" cols="80" id="ta" name="string" rows="8" cols="20"></textarea></p>
+        <p><input type="submit" value="Continue &rarr;" /></p>
+    </form>
+    <div id="out">
+        <h2>Uncompressed:</h2>
+        <div id="uncom">
+            
+        </div>
+        
+        <h2>Compressed:</h2>
+        <div id="com">
+            
+        </div>
+        <div id="decom">
+            
+        </div>
+    </div>
+</body>
+
+<script src="lzw.js"></script>
+<script type="text/javascript" charset="utf-8">
+
+ (function(){       
+        var size = saw.lzw.strSize,
+            decode = saw.lzw.decode,
+            encode = saw.lzw.encode;
+        document.getElementById('myform').onclick = function(e){
+            var D = document;
+            var val = D.getElementById('ta').value;
+            for (var i=0; i < 1000; i++) {
+                var encoded = encode(val);
+            };
+            
+            D.getElementById('uncom').innerHTML = "<p>" + size(val) + " bytes</p>";
+            D.getElementById('com').innerHTML =  "<p>" + size(encoded) + " bytes:</p><textarea rows=\"8\" cols=\"80\">"+encoded+"</textarea>";
+            
+            var decoded = decode(encoded);
+            D.getElementById('decom').innerHTML = decoded;
+            return false;
+        };
+        
+}());
+</script>
+</html>
