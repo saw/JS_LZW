@@ -37,9 +37,8 @@
         document.getElementById('myform').onclick = function(e){
             var D = document;
             var val = D.getElementById('ta').value;
-            for (var i=0; i < 1000; i++) {
+
                 var encoded = encode(val);
-            };
             
             D.getElementById('uncom').innerHTML = "<p>" + size(val) + " bytes</p>";
             D.getElementById('com').innerHTML =  "<p>" + size(encoded) + " bytes:</p><textarea rows=\"8\" cols=\"80\">"+encoded+"</textarea>";
